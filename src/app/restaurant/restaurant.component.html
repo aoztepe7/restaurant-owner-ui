@@ -1,3 +1,180 @@
-<p>
-  restaurant works!
-</p>
+<!-- Container fluid  -->
+<div class="container-fluid">
+  <!-- Start Page Content -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-title">
+          <h3><b>My Restaurants </b></h3>
+        </div>
+        <div class="card-body">
+
+          <div class="table-responsive">
+            <div class="row">
+              <div class="col align-self-end">
+                <button type="button" (click)="openRestaurantCreateModal(restaurantCreateModal)"
+                        class="btn btn-success m-b-10 m-l-5 pull-right">Create New Restaurant
+                </button>
+              </div>
+            </div>
+            <table class="table table-bordered">
+              <thead>
+              <tr>
+                <th><b>Name</b></th>
+                <th><b>Overall</b></th>
+                <th><b>Actions</b></th>
+              </tr>
+              </thead>
+              <tbody>
+
+              <tr *ngFor="let restaurant of restaurantList?.content">
+                <td><strong style="color: #6c757d ">{{restaurant.name}}</strong></td>
+                <td><strong style="color: #6c757d ">{{restaurant.rate}}</strong></td>
+                <td>
+                  <button type="button" (click)="openReviewPage(reviewModal,restaurant.id,restaurant.name)" class="btn btn-success m-b-10 m-l-5">
+                    Reviews
+                  </button>
+                </td>
+              </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+          <div class="row">
+            <div class="col-7">
+              Total {{restaurantList?.numberOfElements}}
+            </div>
+            <div class="col-5">
+              <div class="btn-group float-right">
+                <button *ngIf="!restaurantList?.first" (click)="prevPage()" class="btn btn-gradient waves-effect"
+                        type="button"><i class="fa fa-chevron-left"></i></button>
+                <button *ngIf="!restaurantList?.last" (click)="nextPage()" class="btn btn-gradient waves-effect"
+                        type="button"><i class="fa fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #restaurantCreateModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Create Restaurant</h4>
+  </div>
+  <div class="modal-body">
+    <form (submit)="createRestaurant()" method="post">
+      <div class="modal-body">
+        <div class="alert alert-danger" role="alert" [ngClass]="FadeOutLink()" *ngIf="alert.message.length > 0">
+          {{alert.message}}
+        </div>
+        <div class="basic-form">
+          <div class="form-group">
+            <label>Restaurant Name</label>
+            <input type="text" name="name" class="form-control" autocomplete="off"
+                   [(ngModel)]="restaurantForm.name">
+
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Create</button>
+        <button type="button" (click)="modalRef.hide()" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #reviewModal>
+  <div class="modal-header">
+    <h4 class="modal-title" style="margin: 0 auto;">Reviews for {{restaurantName}}</h4>
+  </div>
+  <div class="modal-body">
+    <div class="alert alert-success" [ngClass]="FadeOutLink()"  role="alert" *ngIf="success.message.length > 0">
+      {{success.message}}
+    </div>
+    <div class="table-responsive">
+
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th><b>Visit Date</b></th>
+          <th><b>Comment</b></th>
+          <th><b>Rate</b></th>
+          <th><b>Actions</b></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr *ngFor="let review of reviewList?.content">
+          <td><strong style="color: #6c757d ">{{review.visitDate}}</strong></td>
+          <td><strong style="color: #6c757d ">{{review.comment}}</strong></td>
+          <td><strong style="color: #6c757d ">{{review.rate}}</strong></td>
+          <td>
+            <button *ngIf="review.answerRequired === true" type="button" (click)="openAnswerCreateModal(answerCreateModal,review.id)" class="btn btn-warning m-b-10 m-l-5">
+              Answer
+            </button>
+            <button *ngIf="review.answerRequired === false" type="button" (click)="showAnswer(answerCreateModal,review.id)" class="btn btn-warning m-b-10 m-l-5">
+              Show Answer
+            </button>
+          </td>
+        </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row">
+      <div class="col-7">
+        Total {{reviewList?.numberOfElements}}
+      </div>
+      <div class="col-5">
+        <div class="btn-group float-right">
+          <button *ngIf="!reviewList?.first" (click)="prevPageReview()" class="btn btn-gradient waves-effect"
+                  type="button"><i class="fa fa-chevron-left"></i></button>
+          <button *ngIf="!reviewList?.last" (click)="nextPageReview()" class="btn btn-gradient waves-effect"
+                  type="button"><i class="fa fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" (click)="modalService._hideModal(1)" class="btn btn-secondary" data-dismiss="modal">
+      Close
+    </button>
+  </div>
+</ng-template>
+
+
+<ng-template #answerCreateModal>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Create Answer</h4>
+  </div>
+  <div class="modal-body">
+    <form (submit)="createAnswer()" method="post">
+      <div class="modal-body">
+        <div class="alert alert-danger" role="alert" [ngClass]="FadeOutLink()" *ngIf="alert.message.length > 0">
+          {{alert.message}}
+        </div>
+        <div class="basic-form">
+          <div class="form-group">
+            <label>Your Answer</label>
+            <input type="text" [disabled]="isDetail" name="ownerAnswer" class="form-control" autocomplete="off"
+                   [(ngModel)]="answerForm.ownerAnswer">
+                </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button *ngIf="isDetail===false" type="submit" class="btn btn-primary">Create</button>
+        <button type="button" (click)="modalRef.hide()" class="btn btn-secondary" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>

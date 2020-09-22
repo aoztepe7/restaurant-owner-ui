@@ -40,8 +40,8 @@ export class AuthService {
 
   _loginAction(result: TokenResponse) {
     if (result && result.token) {
-      localStorage.setItem('token', result.token);
-      window.location.href = '/';
+        localStorage.setItem('token', result.token);
+        window.location.href = '/';
     }
   }
 
